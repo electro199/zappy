@@ -1,7 +1,7 @@
 import time
+from typing import List
 
 from sqlalchemy import (
-    Column,
     Integer,
     BigInteger,
     Text,
@@ -9,7 +9,9 @@ from sqlalchemy import (
     UniqueConstraint,
     ARRAY,
 )
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import declarative_base, mapped_column, Mapped
+
+
 
 from utils.CONSTANTS import LEVELS_AND_XP
 from utils.shortcuts import get_expiry
@@ -19,29 +21,29 @@ Base = declarative_base()
 
 class Tag(Base):
     __tablename__ = "tags"
-    name = Column(Text, primary_key=True)
-    content = Column(Text)
-    owner = Column(BigInteger)
-    created_at = Column(BigInteger)
-    views = Column(Integer)
+    name:Mapped[str] = mapped_column(Text, primary_key=True)
+    content:Mapped[str] = mapped_column(Text)
+    owner:Mapped[int] = mapped_column(BigInteger)
+    created_at:Mapped[int]  = mapped_column(BigInteger)
+    views:Mapped[int] = mapped_column(Integer)
 
 
 class TagRelations(Base):
     __tablename__ = "tag_relations"
-    id = Column(Integer, primary_key=True)
-    name = Column(Text)
-    alias = Column(Text)
+    id:Mapped[int] = mapped_column(Integer, primary_key=True)
+    name:Mapped[str] = mapped_column(Text)
+    alias:Mapped[str] = mapped_column(Text)
 
 
 class Blacklist(Base):
     __tablename__ = "blacklist"
-    id = Column(Integer, primary_key=True)
-    user_id = Column(BigInteger)
-    reason = Column(Text)
-    bot = Column(Boolean)
-    tickets = Column(Boolean)
-    tags = Column(Boolean)
-    expires = Column(BigInteger)
+    id:Mapped[int]  = mapped_column(Integer, primary_key=True)
+    user_id:Mapped[int]  = mapped_column(BigInteger)
+    reason:Mapped[str] = mapped_column(Text)
+    bot:Mapped[bool] = mapped_column(Boolean)
+    tickets:Mapped[bool] = mapped_column(Boolean)
+    tags:Mapped[bool] = mapped_column(Boolean)
+    expires:Mapped[int] = mapped_column(BigInteger)
 
     def is_expired(self):
         if self.expires == 9999999999:
@@ -55,48 +57,48 @@ class Blacklist(Base):
 
 class FlagQuiz(Base):
     __tablename__ = "flag_quiz"
-    id = Column(BigInteger, primary_key=True)
-    user_id = Column(BigInteger)
-    tries = Column(Integer)
-    correct = Column(Integer)
-    completed = Column(Integer)
-    guild_id = Column(BigInteger)
+    id:Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    user_id:Mapped[int] = mapped_column(BigInteger)
+    tries:Mapped[int] = mapped_column(Integer)
+    correct:Mapped[int] = mapped_column(Integer)
+    completed:Mapped[int] = mapped_column(Integer)
+    guild_id:Mapped[int] = mapped_column(BigInteger)
 
 
 class Trivia(Base):
     __tablename__ = "trivia"
-    id = Column(BigInteger, primary_key=True)
-    user_id = Column(BigInteger)
-    correct = Column(Integer)
-    incorrect = Column(Integer)
-    streak = Column(Integer)
-    longest_streak = Column(Integer)
+    id:Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    user_id:Mapped[int] = mapped_column(BigInteger)
+    correct:Mapped[int] = mapped_column(Integer)
+    incorrect:Mapped[int] = mapped_column(Integer)
+    streak:Mapped[int] = mapped_column(Integer)
+    longest_streak:Mapped[int] = mapped_column(Integer)
 
 
 class ReactionRole(Base):
     __tablename__ = "reaction_roles"
-    id = Column(Integer, primary_key=True)
-    message_id = Column(BigInteger)
-    role_id = Column(BigInteger)
-    emoji = Column(Text)
-    roles_given = Column(Integer, default=0)
+    id:Mapped[int] = mapped_column(Integer, primary_key=True)
+    message_id:Mapped[int] = mapped_column(BigInteger)
+    role_id:Mapped[int] = mapped_column(BigInteger)
+    emoji:Mapped[str] = mapped_column(Text)
+    roles_given:Mapped[int] = mapped_column(Integer, default=0)
 
 
 class Warnings(Base):
     __tablename__ = "warnings"
-    warning_id = Column(Integer, primary_key=True)
-    user_id = Column(BigInteger)
-    moderator_id = Column(BigInteger)
-    reason = Column(Text)
-    guild_id = Column(BigInteger)
+    warning_id:Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id:Mapped[int] = mapped_column(BigInteger)
+    moderator_id:Mapped[int] = mapped_column(BigInteger)
+    reason:Mapped[str] = mapped_column(Text)
+    guild_id:Mapped[int] = mapped_column(BigInteger)
 
 
 class Levels(Base):
     __tablename__ = "levels"
-    id = Column(Integer, primary_key=True)
-    guild_id = Column(BigInteger)
-    user_id = Column(BigInteger)
-    total_xp = Column(Integer, default=0)
+    id:Mapped[int] = mapped_column(Integer, primary_key=True)
+    guild_id:Mapped[int] = mapped_column(BigInteger)
+    user_id:Mapped[int] = mapped_column(BigInteger)
+    total_xp:Mapped[int] = mapped_column(Integer, default=0)
 
     @property
     def level(self):
@@ -115,64 +117,60 @@ class Levels(Base):
 
 class CustomRoles(Base):
     __tablename__ = "custom_roles"
-    id = Column(Integer, primary_key=True)
-    guild_id = Column(BigInteger)
-    role_id = Column(BigInteger)
-    user_id = Column(BigInteger)
+    id:Mapped[int] = mapped_column(Integer, primary_key=True)
+    guild_id:Mapped[int] = mapped_column(BigInteger)
+    role_id:Mapped[int] = mapped_column(BigInteger)
+    user_id:Mapped[int] = mapped_column(BigInteger)
 
 
 class RoleReward(Base):
     __tablename__ = "role_rewards"
-    id = Column(Integer, primary_key=True)
-    guild_id = Column(BigInteger)
-    role_id = Column(BigInteger)
-    required_lvl = Column(Integer, default=0)
+    id:Mapped[int] = mapped_column(Integer, primary_key=True)
+    guild_id:Mapped[int] = mapped_column(BigInteger)
+    role_id:Mapped[int] = mapped_column(BigInteger)
+    required_lvl:Mapped[int] = mapped_column(Integer, default=0)
 
 
 class Birthday(Base):
     __tablename__ = "birthday"
-    id = Column(Integer, primary_key=True)
-    user_id = Column(BigInteger)
-    birthday = Column(Text, default=None)
-    birthday_last_changed = Column(BigInteger, default=None)
+    id:Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id:Mapped[int] = mapped_column(BigInteger)
+    birthday:Mapped[str] = mapped_column(Text, default=None)
+    birthday_last_changed:Mapped[int] = mapped_column(BigInteger, default=None)
 
 
 class Timezone(Base):
     __tablename__ = "timezone"
-    id = Column(Integer, primary_key=True)
-    user_id = Column(BigInteger)
-    timezone = Column(Text, default=None)
-    timezone_last_changed = Column(BigInteger, default=None)
+    id:Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id:Mapped[int] = mapped_column(BigInteger)
+    timezone:Mapped[str] = mapped_column(Text, default=None)
+    timezone_last_changed:Mapped[int] = mapped_column(BigInteger, default=None)
 
 
 class Config(Base):
     __tablename__ = "config"
-    guild_id = Column(BigInteger, primary_key=True)
-    xp_boost = Column(Integer, default=1)
-    xp_boost_expiry = Column(BigInteger, default=0)
-    xp_boost_enabled = Column(Boolean, default=True)
-    custom_roles_threshold = Column(Integer, default=20)
-    min_required_lvl = Column(Integer, default=5)
-    position_role_id = Column(BigInteger, default=None)
+    guild_id:Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    xp_boost:Mapped[int] = mapped_column(Integer, default=1)
+    xp_boost_expiry:Mapped[int] = mapped_column(BigInteger, default=0)
+    xp_boost_enabled:Mapped[bool] = mapped_column(Boolean, default=True)
+    custom_roles_threshold:Mapped[int] = mapped_column(Integer, default=20)
+    min_required_lvl:Mapped[int] = mapped_column(Integer, default=5)
+    position_role_id:Mapped[int] = mapped_column(BigInteger, default=None)
 
     @property
-    def boost_expired(self):
-        from time import time
-
-        now = int(time())
+    def boost_expired(self) -> bool:
+        now = int(time.time())
         if self.xp_boost_expiry >= now:
             return False
         return True
 
     @property
-    def boost_time_left(self):
-        from time import time
-
-        now = int(time())
+    def boost_time_left(self) -> int:
+        now = int(time.time())
         return self.xp_boost_expiry - now
 
     @property
-    def get_boost(self):
+    def get_boost(self) -> int:
         return self.xp_boost
 
     @property
@@ -181,29 +179,29 @@ class Config(Base):
 
 
 class Commands(Base):
-    __tablename__ = "commands"
-    __table_args__ = (UniqueConstraint("guild_id", "command"),)
-    id = Column(Integer, primary_key=True)
-    guild_id = Column(BigInteger)
-    command = Column(Text)
-    command_used = Column(Integer, default=0)
+    __tablename__: str = "commands"
+    __table_args__: tuple[UniqueConstraint] = (UniqueConstraint("guild_id", "command"),)
+    id:Mapped[int] = mapped_column(Integer, primary_key=True)
+    guild_id:Mapped[int] = mapped_column(BigInteger)
+    command:Mapped[str] = mapped_column(Text)
+    command_used:Mapped[int] = mapped_column(Integer, default=0)
 
 
 class TotalCommands(Base):
     __tablename__ = "total_commands"
-    id = Column(Integer, primary_key=True)
-    guild_id = Column(BigInteger, unique=True)
-    total_commands_used = Column(Integer, default=0)
+    id:Mapped[int] = mapped_column(Integer, primary_key=True)
+    guild_id:Mapped[int] = mapped_column(BigInteger, unique=True)
+    total_commands_used:Mapped[int] = mapped_column(Integer, default=0)
 
 
 class AutoResponseMessages(Base):
     __tablename__ = "auto_response_messages"
     # needs to be list of strings and list of regex strings, channels, guild and response
-    id = Column(Integer, primary_key=True)
-    guild_id = Column(BigInteger)
-    channel_ids = Column(ARRAY(BigInteger))
-    regex_strings = Column(ARRAY(Text))
-    strings = Column(ARRAY(Text))
-    response = Column(Text)
-    case_sensitive = Column(Boolean, default=False)
-    enabled = Column(Boolean, default=True)
+    id:Mapped[int] = mapped_column(Integer, primary_key=True)
+    guild_id:Mapped[int] = mapped_column(BigInteger)
+    channel_ids:Mapped[List[int]] = mapped_column(ARRAY(BigInteger))
+    regex_strings:Mapped[List[str]] = mapped_column(ARRAY(Text))
+    strings :Mapped[List[str]]= mapped_column(ARRAY(Text))
+    response:Mapped[str] = mapped_column(Text)
+    case_sensitive:Mapped[bool] = mapped_column(Boolean, default=False)
+    enabled :Mapped[bool]= mapped_column(Boolean, default=True)

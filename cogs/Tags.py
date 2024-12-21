@@ -5,8 +5,9 @@ from typing import Optional
 
 import disnake
 from better_profanity import profanity
-from disnake import Embed, ApplicationCommandInteraction
+from disnake import Embed, ApplicationCommandInteraction, User
 from disnake.ext import commands
+from sqlalchemy.ext.asyncio.session import AsyncSession, async_sessionmaker
 
 from utils.CONSTANTS import tag_help
 from utils.DBhandlers import TagManager
@@ -22,7 +23,7 @@ class Tags(commands.Cog, name="Tags"):
     """Everything Tag related"""
 
     def __init__(self, bot: OGIROID):
-        self.tags: TagManager = None
+        # self.tags: Optional[TagManager] = None
         self.bot: OGIROID = bot
 
     @commands.Cog.listener()
@@ -40,7 +41,7 @@ class Tags(commands.Cog, name="Tags"):
         return False
 
     @property
-    def db(self):
+    def db(self) -> None | async_sessionmaker[AsyncSession]:
         return self.bot.db
 
     @commands.slash_command(description="Tags base command")
@@ -77,6 +78,8 @@ class Tags(commands.Cog, name="Tags"):
         name = name.casefold()
         try:
             tag = await self.tags.get(name)
+            assert tag is not None
+            
             await self.tags.increment_views(name)
             if embedded:
                 owner = self.bot.get_user(tag.owner)
@@ -115,7 +118,7 @@ class Tags(commands.Cog, name="Tags"):
         await inter.response.defer()
         name = name.casefold()
 
-        if not self.bot.config.roles.lvl_5 in [role.id for role in inter.author.roles]:
+        if not self.bot.config.roles.lvl_5 in [role.id for role in inter.author.roles]: # type: ignore
             return await errorEmb(inter, "You must be Level 5 to make tags")
 
         try:
@@ -126,9 +129,9 @@ class Tags(commands.Cog, name="Tags"):
         if len(content) >= 1900:
             return await errorEmb(inter, "The tag's content must be under 1900 chars")
         elif re.match(
-            "(https|http)://(dsc\.gg|discord\.gg|discord\.io|dsc\.lol)/?[\S]+/?",
+            "(https|http)://(dsc\.gg|discord\.gg|discord\.io|dsc\.lol)/?[\S]+/?", # type: ignore
             content,
-        ) or re.match("(dsc\.gg|discord\.gg|discord\.io|dsc\.lol)/?[\S]+/?", content):
+        ) or re.match("(dsc\.gg|discord\.gg|discord\.io|dsc\.lol)/?[\S]+/?", content): # type: ignore
             return await errorEmb(inter, "You can't make a tag with an invite")
         # if content contains slurs or severe profanity
         elif profanity.contains_profanity(content):
@@ -170,7 +173,7 @@ class Tags(commands.Cog, name="Tags"):
 
         try:
             if (
-                inter.author.id != (await self.tags.get(name)).owner
+                inter.author.id != (await self.tags.get(name)).owner # type: ignore
             ) and not manage_messages_perms(inter):
                 return await errorEmb(
                     inter, "You do not have permission to edit this tag"
@@ -201,7 +204,7 @@ class Tags(commands.Cog, name="Tags"):
             if new_owner.bot:
                 return await errorEmb(inter, "You can't transfer a tag to a bot!")
             elif (
-                inter.author.id != (await self.tags.get(name)).owner
+                inter.author.id != (await self.tags.get(name)).owner # type: ignore
             ) and not manage_messages_perms(inter):
                 return await errorEmb(
                     inter, "You must be the owner of the tag to transfer it!"
@@ -225,11 +228,11 @@ class Tags(commands.Cog, name="Tags"):
         try:
             name = name.casefold()
             await self.tags.exists(name, TagNotFound, should=True)
-            if (await self.tags.get(name)).owner == inter.author.id:
+            if (await self.tags.get(name)).owner == inter.author.id: # type: ignore
                 return await errorEmb(inter, "You already own this tag!")
             elif (
-                inter.author.guild_permissions.manage_messages
-                or inter.author.guild_permissions.administrator
+                inter.author.guild_permissions.manage_messages # type: ignore
+                or inter.author.guild_permissions.administrator # type: ignore
             ):
                 await self.tags.transfer(name, inter.author.id)
                 return (
@@ -237,8 +240,8 @@ class Tags(commands.Cog, name="Tags"):
                     .success()
                     .send()
                 )
-            elif (await self.tags.get(name)).owner in [
-                member.id for member in inter.guild.members
+            elif (await self.tags.get(name)).owner in [ # type: ignore
+                member.id for member in inter.guild.members # type: ignore
             ]:
                 return await errorEmb(
                     inter, "The owner of this tag is still in this guild!"
@@ -247,7 +250,7 @@ class Tags(commands.Cog, name="Tags"):
             return (
                 await QuickEmb(
                     inter,
-                    f"You have now claimed this tag because the previous owner of the tag is no longer in {inter.guild.name}",
+                    f"You have now claimed this tag because the previous owner of the tag is no longer in {inter.guild.name}", # type: ignore
                 )
                 .success()
                 .send()
@@ -265,7 +268,7 @@ class Tags(commands.Cog, name="Tags"):
             await self.tags.exists(name, TagNotFound, should=True)
             if not inter.author.id == (
                 await self.tags.get(name)
-            ).owner and not manage_messages_perms(inter):
+            ).owner and not manage_messages_perms(inter): # type: ignore
                 return await errorEmb(
                     inter, "You must be the owner of the tag to delete it!"
                 )
@@ -281,18 +284,26 @@ class Tags(commands.Cog, name="Tags"):
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def info(self, inter: ApplicationCommandInteraction, name):
         await inter.response.defer()
-        name = name.casefold()
+        name = name.casefold() 
         try:
             await self.tags.exists(name, TagNotFound, should=True)
             tag = await self.tags.get(name)
+            
+            if tag is None :
+                raise TagNotFound
+
             await self.tags.increment_views(name)
+
             owner = self.bot.get_user(tag.owner)
+            assert owner is not None, "Owner was None" 
+
             emb = Embed(
                 color=disnake.Color.random(seed=hash(tag.name))
             )  # hash -> seed makes the color the same for the tag
             emb.add_field(name="Name", value=tag.name)
             emb.add_field(name="Owner", value=owner.mention)
             aliases = await self.tags.get_aliases(name)
+            
             if aliases:
                 emb.add_field(name="Aliases", value=", ".join(tag for tag in aliases))
             emb.add_field(name="Created At", value=f"<t:{tag.created_at}:R>")
@@ -316,7 +327,7 @@ class Tags(commands.Cog, name="Tags"):
         lb_header = "Place  ***-***  Name  ***-***  Total Views ***-*** Owner"
 
         for i, tag in enumerate(tags):
-            owner: Optional = self.bot.get_user(tag.owner)
+            owner: Optional[User] = self.bot.get_user(tag.owner)
             if owner is None:
                 username = None
             else:
@@ -399,7 +410,7 @@ class Tags(commands.Cog, name="Tags"):
             await self.tags.exists(new_name, TagAlreadyExists, should=False)
             if not inter.author.id == (
                 await self.tags.get(name)
-            ).owner and not manage_messages_perms(inter):
+            ).owner and not manage_messages_perms(inter): # type: ignore
                 return await errorEmb(
                     inter, "You must be the owner of the tag to rename it!"
                 )
@@ -458,7 +469,7 @@ class Tags(commands.Cog, name="Tags"):
 
             if not inter.author.id == (
                 await self.tags.get(name)
-            ).owner and not manage_messages_perms(inter):
+            ).owner and not manage_messages_perms(inter): # type: ignore
                 return await errorEmb(
                     inter, "You must be the owner of the tag to delete it!"
                 )
@@ -499,7 +510,7 @@ class Tags(commands.Cog, name="Tags"):
                 )
             elif not inter.author.id == (
                 await self.tags.get(name)
-            ).owner and not manage_messages_perms(inter):
+            ).owner and not manage_messages_perms(inter): # type: ignore
                 return await errorEmb(
                     inter, "You must be the owner of the tag to delete it!"
                 )

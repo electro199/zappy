@@ -89,7 +89,7 @@ class FlagQuizHandler:
         return record is not None
 
     async def get_leaderboard(
-        self, order_by="correct", guild_id: int = None
+        self, order_by="correct", guild_id: Optional[int] = None
     ) -> Sequence[FlagQuiz]:
         async with self.db.begin() as session:
             records = await session.execute(
@@ -197,7 +197,7 @@ class BlacklistHandler:
         bot: bool,
         tickets: bool,
         tags: bool,
-        expires: int,
+        expires: float,
     ):
         user = Blacklist(
             user_id=user_id,
@@ -273,7 +273,7 @@ class TagManager:
         self.db = db
         self.session = self.bot.session
         self.names = {"tags": [], "aliases": []}
-        self.cache = AsyncTTL(timings.DAY / 2)  # cache tags for 12 hrs
+        self.cache = AsyncTTL(int(timings.DAY / 2))  # cache tags for 12 hrs
 
     async def startup(self):
         await self.bot.wait_until_ready()
@@ -293,7 +293,7 @@ class TagManager:
         name = await self.get_name(name)
         return await self.cache.get(name)
 
-    async def exists(self, name, exception: TagException, should: bool) -> bool:
+    async def exists(self, name, exception: type[TagException], should: bool) -> bool:
         """Returns True if the tag exists"""
         name = name.casefold()
         if await self.cache.exists(name):
@@ -325,7 +325,7 @@ class TagManager:
         self.names["tags"].append(name)
         await self.cache.add(name, new_tag)
 
-    async def get(self, name, /, force: bool = False) -> Type[Tag] | None:
+    async def get(self, name, /, force: bool = False) -> Tag | None:
         """
         Returns the tag object of the tag with the given name or alias
         args:
@@ -508,7 +508,7 @@ class TagManager:
         async with self.db.begin() as session:
             await session.delete(select(TagRelations).filter_by(name=name))
 
-    async def get_aliases(self, name: Optional = None) -> List[str] | TagNotFound:
+    async def get_aliases(self, name: Optional[str] = None) -> list[str]:
         if not name:
             async with self.db.begin() as session:
                 records = await session.execute(select(TagRelations))

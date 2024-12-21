@@ -100,5 +100,5 @@ class Utilities(commands.Cog):
         await sucEmb(inter, "Snipe cache cleared!")
 
 
-def setup(bot: commands.Bot):
+def setup(bot: OGIROID):
     bot.add_cog(Utilities(bot))

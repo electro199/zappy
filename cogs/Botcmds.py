@@ -1,6 +1,7 @@
 import datetime
 import time
 from collections import Counter
+from typing import Optional
 
 import disnake
 from disnake.ext import commands
@@ -245,7 +246,7 @@ class Commands(commands.Cog):
         await inter.send(embed=e)
 
     @commands.slash_command()
-    async def whois(self, inter, *, user: disnake.Member = None):
+    async def whois(self, inter, *, user: Optional[disnake.Member] = None):
         """Shows info about a user."""
         if user == None:
             user: disnake.Member = inter.author
@@ -315,10 +316,10 @@ class Commands(commands.Cog):
     async def avatar(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        user: disnake.Member = None,
+        user: Optional[disnake.Member] = None,
     ):
         """Shows the avatar of a user."""
-        if user == None:
+        if user is None:
             user = inter.author
 
         embed = disnake.Embed(title=f"{user}'s avatar")

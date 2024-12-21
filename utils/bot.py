@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 from dotenv import load_dotenv
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker,AsyncSession
 
 import disnake
 from disnake import ApplicationCommandInteraction, OptionType
@@ -32,8 +32,8 @@ class OGIROID(commands.InteractionBot):
         self.config = Config()
         self.commands_ran = {}
         self.total_commands_ran = {}
-        self.db = None
-        self.blacklist: BlacklistHandler = None
+        self.db: async_sessionmaker[AsyncSession]
+        self.blacklist: BlacklistHandler
         self.add_app_command_check(
             self.blacklist_check, slash_commands=True, call_once=True
         )

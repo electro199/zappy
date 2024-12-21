@@ -113,5 +113,5 @@ class GitHub(commands.Cog):
         await inter.send(embed=embed, components=button)
 
 
-def setup(bot):
+def setup(bot:OGIROID):
     bot.add_cog(GitHub(bot))

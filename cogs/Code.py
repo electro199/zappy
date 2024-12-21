@@ -79,11 +79,11 @@ class CodeModal(disnake.ui.Modal):
 
     @staticmethod
     async def run_code(*, lang: str, code: str):
-        code = await session.post(
+        resp = await session.post(
             "https://emkc.org/api/v1/piston/execute",
             json={"language": lang, "source": code},
         )
-        return await code.json()
+        return await resp.json()
 
     @staticmethod
     async def _send_result(inter, result: dict):
@@ -107,9 +107,8 @@ class CodeModal(disnake.ui.Modal):
 
     @staticmethod
     def _check_valid_lang(param):
-        if str(param).casefold() not in VALID_CODE_LANGUAGES:
-            return False
-        return True
+        return str(param).casefold() in VALID_CODE_LANGUAGES
+
 
 
 def setup(bot: OGIROID):

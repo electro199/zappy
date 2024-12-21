@@ -574,5 +574,5 @@ async def load_image(url):
     return img
 
 
-def setup(bot):
+def setup(bot: OGIROID):
     bot.add_cog(Fun(bot))

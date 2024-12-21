@@ -50,5 +50,5 @@ class Search(commands.Cog):
         await inter.send(f"https://stackoverflow.com/search?q={query}")
 
 
-def setup(bot: commands.Bot):
+def setup(bot: OGIROID):
     bot.add_cog(Search(bot))
