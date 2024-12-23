@@ -1,6 +1,6 @@
 import datetime as dt
 import math
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from disnake import ui, ButtonStyle, Embed, MessageInteraction
 
@@ -25,7 +25,7 @@ class CreatePaginator(ui.View):
 
     """
 
-    def __init__(self, embeds: list, author: int = 123, timeout: float = None):
+    def __init__(self, embeds: list, author: int = 123, timeout: Optional[float] = None):
         self.embeds = embeds
         self.author = author
         self.CurrentEmbed = 0
@@ -47,7 +47,7 @@ class CreatePaginator(ui.View):
                 await inter.edit_original_response(embed=self.embeds[0])
                 self.CurrentEmbed = 0
             else:
-                raise ()
+                raise RuntimeError()
 
         except Exception as e:
             print(e)
@@ -71,7 +71,7 @@ class CreatePaginator(ui.View):
                 )
                 self.CurrentEmbed = self.CurrentEmbed - 1
             else:
-                raise ()
+                raise RuntimeError()
 
         except Exception as e:
             print(e)
@@ -129,7 +129,7 @@ class LeaderboardView(ui.View):
         firstemb: Embed,
         author: int = 123,
         set_user: bool = False,
-        timeout: float = None,
+        timeout: Optional[float] = None,
     ):
         self.controller = controller
         self.author = author
@@ -213,7 +213,7 @@ class LeaderboardView(ui.View):
                 )
                 self.CurrentEmbed = 0
             else:
-                raise ()
+                raise RuntimeError()
         except Exception as e:
             await inter.send("Unable to change the page.", ephemeral=True)
 
@@ -235,7 +235,7 @@ class LeaderboardView(ui.View):
                 )
                 self.CurrentEmbed = self.CurrentEmbed - 1
             else:
-                raise ()
+                raise RuntimeError()
 
         except Exception as e:
             print(e)
